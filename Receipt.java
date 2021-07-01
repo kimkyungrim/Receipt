@@ -3,6 +3,7 @@ package Receipt;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Scanner;
 
 public class Receipt {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 	    int inputNo = 0, count = 0, totalprice = 0, VAT = 0, num = 0;
 	    Scanner scan =  new Scanner(System.in); 
 	    
@@ -102,5 +103,17 @@ public class Receipt {
 			System.out.printf("%18s %5s %11d \n", "부가세", "과세물품가액", totalprice-VAT);
 			System.out.printf("%18s %24d \n", "부가세", VAT);
 			System.out.println(" ");	
+			
+			//DB에 데이터 넣기
+			Class.forName("com.mysql.cj.jdbc.Driver"); 
+			Connection conn2 = DriverManager.getConnection("jdbc:mysql://127.0.0.1/kopo03", "root" , "635300");
+			
+			Statement stmt = conn2.createStatement();
+			
+			for(int i = 0; i < orderList.size(); i++) {
+			stmt.execute("insert into receipt (product, price, count, totalprice) values ('"+orderList.get(i).name+"', '"+orderList.get(i).price+"', '"+orderList.get(i).count+"', '"+orderList.get(i).price * orderList.get(i).count+"');");	
+			}
+			stmt.close();
+			conn2.close();
 	}
 }
